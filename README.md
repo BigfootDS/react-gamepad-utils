@@ -4,7 +4,7 @@ A base piece of a larger, ElectronJS + ReactJS game "engine" tech stack. Built f
 
 ## Hey!
 
-This package does not currently do anything, I'm literally only making it public right now because I want to make sure I can compile and publish to NPM properly. Hang tight for actual functionality!
+This package does not currently do much, and should not be considered "stable". I'm literally only making it public right now because I want to make sure I can compile and publish to NPM properly. Hang tight for stability!
 
 ## Package Goals
 
@@ -45,17 +45,17 @@ This package will not cover the features listed here, as those will instead be c
 - "Where's the backwards compatible XYZ? Where's the conditional check for the gamepad system and webkit fallback?"
   - This library is built for BigfootDS' needs, and we are using ElectronJS. ElectronJS bundles in an extremely modern Chromium. If you're not using a recent version of ElectronJS, you should update!
 
-  ## TODO
+## TODO
 
-  - Actual control over the polling loop
-    - need better logic over requesting and cancelling animation frames, the latestFrameId doesn't give us much functionality
-  - Confirm the other gamepad serialized data - buttons work, but what about axes? Can we name buttons?
+- Actual control over the polling loop
+  - need better logic over requesting and cancelling animation frames, the latestFrameId doesn't give us much functionality
+- Confirm the other gamepad serialized data - buttons work, but what about axes? Can we name buttons?
 
-  ## Usage
+## Usage
 
-  Given that this repo is in very early development, don't expect this to be accurate for long... but... here:
+Given that this repo is in very early development, don't expect this to be accurate for long... but... here:
 
-  ```jsx
+```jsx
 
 import { useEffect } from 'react';
 import './App.css'
@@ -75,6 +75,7 @@ function App() {
   if (gamepads[0]){
     return <>
      <h1>Found {gamepads.length} devices.</h1>
+
      {gamepads.map((data, index) => {
       return <div key={data.id + "-" + index + "-" + data.index}>
         <h2>{data.id}</h2>
@@ -88,10 +89,10 @@ function App() {
     </>
   } else {
     return <>
-    <h1>No devices available.</h1>
+      <h1>No devices available.</h1>
     </>
   }
 }
 
 export default App
-  ```
+```
