@@ -35,7 +35,7 @@ export function GamepadBaseProvider({children}: {children: React.ReactElement}){
 	}, [latestFrameId]);
 
 	useEffect(() => {
-		if (shouldBePolling == true){
+		if (shouldBePolling == true && !latestFrameId){
 			const frame = (time: DOMHighResTimeStamp) => {
 			
 				// "time" is from the requestAnimationFrame callback

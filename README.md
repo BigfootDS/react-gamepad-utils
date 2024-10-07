@@ -50,3 +50,48 @@ This package will not cover the features listed here, as those will instead be c
   - Actual control over the polling loop
     - need better logic over requesting and cancelling animation frames, the latestFrameId doesn't give us much functionality
   - Confirm the other gamepad serialized data - buttons work, but what about axes? Can we name buttons?
+
+  ## Usage
+
+  Given that this repo is in very early development, don't expect this to be accurate for long... but... here:
+
+  ```jsx
+
+import { useEffect } from 'react';
+import './App.css'
+import { useGamepadContext } from '@bigfootds/react-gamepad-utils';
+
+function App() {
+  let {gamepads, setShouldBePolling} = useGamepadContext();
+
+  useEffect(() => {
+    setShouldBePolling(true)
+  }, [setShouldBePolling]);
+
+  useEffect(() => {
+    console.log("Gamepad data updated.");
+  }, [gamepads]);
+
+  if (gamepads[0]){
+    return <>
+     <h1>Found {gamepads.length} devices.</h1>
+     {gamepads.map((data, index) => {
+      return <div key={data.id + "-" + index + "-" + data.index}>
+        <h2>{data.id}</h2>
+        {data.buttons.map((button, buttonIndex) => <div key={buttonIndex}>
+        <h3>Button {buttonIndex}: {button.pressed ? "Pressed" : "Not Pressed"}</h3>
+        <h3>Button {buttonIndex}: {button.touched ? "Touched" : "Not Touched"}</h3>
+        <h3>Button {buttonIndex}: {button.value}</h3>
+        </div>)}
+      </div>
+     })}
+    </>
+  } else {
+    return <>
+    <h1>No devices available.</h1>
+    </>
+  }
+}
+
+export default App
+  ```
