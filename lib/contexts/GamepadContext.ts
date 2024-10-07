@@ -1,4 +1,5 @@
 import { createContext } from "react";
+import { GamepadState } from "../interfaces/GamepadState";
 
 interface GamepadBaseProviderValues {
 	currentGamepadData?: (Gamepad | null)[] | null;
@@ -11,6 +12,8 @@ interface GamepadBaseProviderValues {
 	setLatestFrameId?: React.Dispatch<React.SetStateAction<number>>;
 	frameTime?: number;
 	setFrameTime?: React.Dispatch<React.SetStateAction<number>>;
+	gamepads?: GamepadState[];
+	setGamepads?: React.Dispatch<React.SetStateAction<GamepadState[]>>;
 }
 
 let initialValue: GamepadBaseProviderValues = {

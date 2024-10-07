@@ -1,50 +1,52 @@
-# React + TypeScript + Vite
+# @bigfootds/react-gamepad-utils
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A base piece of a larger, ElectronJS + ReactJS game "engine" tech stack. Built for BigfootDS' specific needs, intended to be used by other packages or components.
 
-Currently, two official plugins are available:
+## Hey!
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+This package does not currently do anything, I'm literally only making it public right now because I want to make sure I can compile and publish to NPM properly. Hang tight for actual functionality!
 
-## Expanding the ESLint configuration
+## Package Goals
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+This package provides a configurable input polling loop, and some helper methods to serialize gamepad input data.
 
-- Configure the top-level `parserOptions` property like this:
+It is a _base_ package - other packages should be made to use its functionality in more-complex or more-thorough ways.
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+Keep in mind that this area of browser-based JavaScript functionality is somehow both barely-touched and one spec decision away from major breaking issues. Keep an eye on the MDN web docs for Gamepad functionality and updates, and raise issues here if I've missed something!
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+## Package Anti-Goals
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
+This package will not cover the features listed here, as those will instead be covered by other packages that depend on this one instead.
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
-```
+- UI navigation trees.
+  - That system depends on the outputs of this one!
+  - If you've used Unity, it's the UI navigation stuff that you can configure that determines which UI element is highlighted/focused when you press a directional/arrow/movement input. The yellow connectors in [the documentation here](https://docs.unity3d.com/Packages/com.unity.ugui@1.0/manual/script-SelectableNavigation.html), essentially.
+- Gamepad controller maps.
+  - That system depends on the outputs of this one!
+  - Realistically, controller maps should be a design problem that you, the game developer, solves. How are they persisted? What is default? What controllers do you support? What UI do you use to remap? What UX should be in place to remap? Games should strive to have remappable controller layouts [as per industry standards](https://gameaccessibilityguidelines.com/allow-controls-to-be-remapped-reconfigured/), but figuring out answers to those questions specifically for your game is up to you!
+- Gamepad-controlled DOM elements.
+  - This is kinda in the same boat as controller mapping and UI navigation trees - depends on output of this, and additionally is going to be very specific to your game.
+
+## Package Exports
+
+- Contexts
+  - `GamepadContext`: Context reference for the rest of the things in this library. Its values are determined by the logic in the `GamepadBaseProvider` - it should be an object containing properties and functions.
+- Components
+  - `GamepadBaseProvider`: Initializes and provide the `GamepadContext`, as well as various functions and variables to configure the input polling loop. 
+- Hooks
+  - `useGamepadContext`: Just returns the `GamepadContext` as-is.
+- Utilities
+  - Gamepad Data helper functions:
+    - `getGamepadsData()`: An error-safe function that attempts to retrieve gamepad data from the browser's navigator system. Will catch errors and return an empty array if no data can be retrieved, logging a warning when that happens.
+    - `serializeGamepads()`: Returns a large object of data, which is all essentially just a processed and serializable snapshot of the unserializable snapshot returned by `getGamepadsData()`. 
+
+## Considerations
+
+- "Where's the backwards compatible XYZ? Where's the conditional check for the gamepad system and webkit fallback?"
+  - This library is built for BigfootDS' needs, and we are using ElectronJS. ElectronJS bundles in an extremely modern Chromium. If you're not using a recent version of ElectronJS, you should update!
+
+  ## TODO
+
+  - Actual control over the polling loop
+    - need better logic over requesting and cancelling animation frames, the latestFrameId doesn't give us much functionality
+  - Confirm the other gamepad serialized data - buttons work, but what about axes? Can we name buttons?

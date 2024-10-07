@@ -1,21 +1,23 @@
 import PropTypes from "prop-types";
 import { useEffect, useState } from "react";
 import { GamepadContext } from "../contexts/GamepadContext";
-import { getGamepadsData } from "../utils/GamepadsData";
+import { getRawGamepadsData } from "../utils/GamepadsData";
+import { GamepadState } from "../interfaces/GamepadState";
 
 
 
 export function GamepadBaseProvider({children}: {children: React.ReactElement}){
-	let [currentGamepadData, setCurrentGamepadData] = useState<(Gamepad | null)[] | null>([]); // last-retrieved controller input data
+	let [rawGamepadData, setRawGamepadData] = useState<(Gamepad | null)[] | null>([]); // last-retrieved controller input data
 	let [shouldBePolling, setShouldBePolling] = useState(false); // if we should be checking for controller input at all
 	let [pollingRate, setPollingRate] = useState(16.67); // how often we should be checking for controller input
 	let [latestFrameId, setLatestFrameId] = useState(0);
 	const [frameTime, setFrameTime] = useState(0);
+	let [gamepads, setGamepads] = useState<GamepadState[]>([]);
 
 	// Detect gamepads ASAP when page loads
 	// This is useful for any controller that is already connected before page load
 	window.addEventListener("gamepadconnected", () => {
-		setCurrentGamepadData(getGamepadsData());
+		setRawGamepadData(getRawGamepadsData());
 	});
 
 	
@@ -33,7 +35,7 @@ export function GamepadBaseProvider({children}: {children: React.ReactElement}){
 	}, [latestFrameId]);
 
 	useEffect(() => {
-		if (shouldBePolling == true && !latestFrameId){
+		if (shouldBePolling == true){
 			const frame = (time: DOMHighResTimeStamp) => {
 			
 				// "time" is from the requestAnimationFrame callback
@@ -44,8 +46,31 @@ export function GamepadBaseProvider({children}: {children: React.ReactElement}){
 				setLatestFrameId(requestAnimationFrame(frame));
 
 				// Per-frame gamepad stuff now:
-				setCurrentGamepadData(getGamepadsData());
+				let gamepadRaws = getRawGamepadsData();
+				setRawGamepadData(gamepadRaws);
 
+				let editableGamepads = Array.from(gamepads, original => original);
+				for (let index = 0; index < gamepadRaws.length; index++) {
+					const detectedGamepadRaw = gamepadRaws[index];
+				
+					if (detectedGamepadRaw){
+						
+						editableGamepads[index] = {
+							id: detectedGamepadRaw.id,
+							buttons: detectedGamepadRaw.buttons.map((button) => {return {pressed: button.pressed, touched: button.touched, value: button.value}}),
+							axes: [...detectedGamepadRaw.axes],
+							mapping: detectedGamepadRaw.mapping, 
+							timestamp: detectedGamepadRaw.timestamp, 
+							connected: detectedGamepadRaw.connected, 
+							index: detectedGamepadRaw.index, 
+							vibrationActuator: {
+								playEffect: detectedGamepadRaw.vibrationActuator.playEffect,
+								reset: detectedGamepadRaw.vibrationActuator.reset
+							}
+						}
+					}
+				}
+				setGamepads(editableGamepads);
 			}
 			requestAnimationFrame(frame);
 		} else {
@@ -57,8 +82,8 @@ export function GamepadBaseProvider({children}: {children: React.ReactElement}){
 
 	return(
 		<GamepadContext.Provider value={{
-			currentGamepadData, 
-			setCurrentGamepadData,
+			currentGamepadData: rawGamepadData, 
+			setCurrentGamepadData: setRawGamepadData,
 			shouldBePolling, 
 			setShouldBePolling,
 			pollingRate, 
@@ -66,7 +91,9 @@ export function GamepadBaseProvider({children}: {children: React.ReactElement}){
 			latestFrameId, 
 			setLatestFrameId,
 			frameTime, 
-			setFrameTime
+			setFrameTime,
+			gamepads,
+			setGamepads
 		}}>
 			{children}
 		</GamepadContext.Provider>

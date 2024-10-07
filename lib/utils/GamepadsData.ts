@@ -1,6 +1,6 @@
 
 
-export const getGamepadsData = () => {
+export const getRawGamepadsData = () => {
 	let result: (Gamepad | null)[] = [];
 	try{
 		result = window.navigator.getGamepads();
