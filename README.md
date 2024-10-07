@@ -56,7 +56,6 @@ This package will not cover the features listed here, as those will instead be c
 Given that this repo is in very early development, don't expect this to be accurate for long... but... here:
 
 ```jsx
-
 import { useEffect } from 'react';
 import './App.css'
 import { useGamepadContext } from '@bigfootds/react-gamepad-utils';
@@ -72,10 +71,11 @@ function App() {
     console.log("Gamepad data updated.");
   }, [gamepads]);
 
-  if (gamepads[0]){
+  if (gamepads.some(entry => entry)){
     return <>
-     <h1>Found {gamepads.length} devices.</h1>
-
+     <h1>Found {gamepads.reduce((total, gamepad) => {
+      return gamepad ? total + 1 : total;
+     }, 0)} devices.</h1>
      {gamepads.map((data, index) => {
       return <div key={data.id + "-" + index + "-" + data.index}>
         <h2>{data.id}</h2>
@@ -89,10 +89,16 @@ function App() {
     </>
   } else {
     return <>
-      <h1>No devices available.</h1>
+    <h1>No devices available.</h1>
     </>
   }
 }
 
 export default App
 ```
+
+## Device Confirmation List
+
+This is a list of physical game controllers that have been confirmed to work with this package.
+
+- Xbox Elite Wireless Controller Series 2 
