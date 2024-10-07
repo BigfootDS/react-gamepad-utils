@@ -6,6 +6,14 @@ A base piece of a larger, ElectronJS + ReactJS game "engine" tech stack. Built f
 
 This package does not currently do much, and should not be considered "stable". I'm literally only making it public right now because I want to make sure I can compile and publish to NPM properly. Hang tight for stability!
 
+## Installation
+
+Install this package from NPM with this command:
+
+```bash
+npm i @bigfootds/react-gamepad-utils
+```
+
 ## Package Goals
 
 This package provides a configurable input polling loop, and some helper methods to serialize gamepad input data.
