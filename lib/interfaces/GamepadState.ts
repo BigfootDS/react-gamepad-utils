@@ -5,7 +5,7 @@ export interface GamepadState {
 
 	readonly buttons: GamepadButtonSerialized[];
 
-	readonly axes: number[];
+	readonly axes: GamepadAxisWithDeadzone[];
 
 	readonly mapping: string;
 
@@ -31,4 +31,28 @@ export interface GamepadButtonSerialized {
 	value: number;
 
 	
+}
+
+export interface GamepadAxisWithDeadzone {
+	
+	
+	/**
+	 * The raw axis value from the Gamepad system.
+	 * @author BigfootDS
+	 */
+	raw: number;
+
+	
+	/**
+	 * Let the user configure this as part of the app settings.
+	 * @author BigfootDS
+	 */
+	deadzoneOffset: number;
+
+	
+	/**
+	 * This should be the result of raw minus the deadzoneOffset.
+	 * @author BigfootDS
+	 */
+	value: number;
 }

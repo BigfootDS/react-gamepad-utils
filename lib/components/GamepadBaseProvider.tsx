@@ -1,5 +1,5 @@
 import PropTypes from "prop-types";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { GamepadContext } from "../contexts/GamepadContext";
 import { getRawGamepadsData } from "../utils/GamepadsData";
 import { GamepadState } from "../interfaces/GamepadState";
@@ -13,6 +13,7 @@ export function GamepadBaseProvider({children}: {children: React.ReactElement}){
 	let [latestFrameId, setLatestFrameId] = useState(0);
 	const [frameTime, setFrameTime] = useState(0);
 	let [gamepads, setGamepads] = useState<GamepadState[]>([]);
+	let deadzoneOffsetRaws = useRef<Array<Array<number>>>([[0,0,0,0], [0,0,0,0], [0,0,0,0], [0,0,0,0]]);
 
 	// Detect gamepads ASAP when page loads
 	// This is useful for any controller that is already connected before page load
@@ -54,11 +55,23 @@ export function GamepadBaseProvider({children}: {children: React.ReactElement}){
 					const detectedGamepadRaw = gamepadRaws[index];
 				
 					if (detectedGamepadRaw){
+
+						let tempAxesCopy = [...detectedGamepadRaw.axes];
+						let tempAxesWithDeadzone = tempAxesCopy.map((singularAxis, axisIndex) => {
+							// console.log(index, axisIndex, deadzoneOffsetRaws.current[index], deadzoneOffsetRaws.current[index][axisIndex]);
+							return {
+								raw: singularAxis,
+								deadzoneOffset: deadzoneOffsetRaws.current[index][axisIndex],
+								value: deadzoneOffsetRaws.current[index][axisIndex] > 0 ? singularAxis - deadzoneOffsetRaws.current[index][axisIndex] : deadzoneOffsetRaws.current[index][axisIndex] - singularAxis
+							}
+						});
+
+						// console.log(JSON.stringify(tempAxesWithDeadzone, null, 4));
 						
 						editableGamepads[index] = {
 							id: detectedGamepadRaw.id,
 							buttons: detectedGamepadRaw.buttons.map((button) => {return {pressed: button.pressed, touched: button.touched, value: button.value}}),
-							axes: [...detectedGamepadRaw.axes],
+							axes: JSON.parse(JSON.stringify(tempAxesWithDeadzone)),
 							mapping: detectedGamepadRaw.mapping, 
 							timestamp: detectedGamepadRaw.timestamp, 
 							connected: detectedGamepadRaw.connected, 
@@ -79,6 +92,22 @@ export function GamepadBaseProvider({children}: {children: React.ReactElement}){
 	// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [shouldBePolling]);
 
+	const setAxesDeadzonesForGamepad = (gamepadIndex: number = 0) => {
+		// Tell the user not to touch the joysticks while this function is running.
+		// Save the joystick values to their equivalent position in the deadzoneOffsetRaws state.
+
+		console.log("Updating deadzone for gamepad at index " + gamepadIndex);
+
+		let gamepadRaws = getRawGamepadsData();
+		setRawGamepadData(gamepadRaws);
+
+		let tempDeadzoneOffsetRaws = JSON.parse(JSON.stringify(deadzoneOffsetRaws));
+
+		tempDeadzoneOffsetRaws[gamepadIndex] = gamepadRaws[gamepadIndex] ? gamepadRaws[gamepadIndex].axes : [0,0,0,0];
+
+		deadzoneOffsetRaws.current = JSON.parse(JSON.stringify(tempDeadzoneOffsetRaws));
+	}
+
 
 	return(
 		<GamepadContext.Provider value={{
@@ -93,7 +122,9 @@ export function GamepadBaseProvider({children}: {children: React.ReactElement}){
 			frameTime, 
 			setFrameTime,
 			gamepads,
-			setGamepads
+			setGamepads,
+			deadzoneOffsetRaws,
+			setAxesDeadzonesForGamepad
 		}}>
 			{children}
 		</GamepadContext.Provider>

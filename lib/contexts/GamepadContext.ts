@@ -14,6 +14,8 @@ interface GamepadBaseProviderValues {
 	setFrameTime?: React.Dispatch<React.SetStateAction<number>>;
 	gamepads?: GamepadState[];
 	setGamepads?: React.Dispatch<React.SetStateAction<GamepadState[]>>;
+	deadzoneOffsetRaws?: React.MutableRefObject<number[][]>;
+	setAxesDeadzonesForGamepad?: (gamepadIndex?: number) => void;
 }
 
 let initialValue: GamepadBaseProviderValues = {
