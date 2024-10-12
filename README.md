@@ -153,15 +153,15 @@ Add this CSS to your default Vite ReactJS app to see a demo like the screenshot 
 
 Per Chromium restrictions, gamepads do not get detected until after they have been used. You'll wanna prompt your users to "press a button to play" or some similar message.
 
-![From the sample code above, this image appears. No devices are detected until they are used.](./docs/001.png)
+![From the sample code above, this image appears. No devices are detected until they are used.](https://github.com/BigfootDS/react-gamepad-utils/blob/main/docs/001.png)
 
 Each device can be accessed and its properties can be read.
 
-![A sample of what we can display or detect once a controller has been detected.](./docs/002.png)
+![A sample of what we can display or detect once a controller has been detected.](https://github.com/BigfootDS/react-gamepad-utils/blob/main/docs/002.png)
 
 To set a gamepad axis' deadzone, just call the `setAxesDeadzonesForGamepad()` function and pass in the gamepad's index. Just keep in mind that deadzones may lead to weird behaviour - and not supporting deadzones will definitely lead to weirder behaviour. You should provide a way for users to wipe any stored deadzone data, a way to add a "minimum required movement" property (which we're thinking of adding, who knows when?) to help offset drifty joysticks, and a way to call that automated `setAxesDeadzonesForGamepad()` function too. Controller input can be a lot of work!
 
-![An example of axis deadzones and their impact on an axis value.](./docs/003.png)
+![An example of axis deadzones and their impact on an axis value.](https://github.com/BigfootDS/react-gamepad-utils/blob/main/docs/003.png)
 
 
 
