@@ -59,10 +59,19 @@ export function GamepadBaseProvider({children}: {children: React.ReactElement}){
 						let tempAxesCopy = [...detectedGamepadRaw.axes];
 						let tempAxesWithDeadzone = tempAxesCopy.map((singularAxis, axisIndex) => {
 							// console.log(index, axisIndex, deadzoneOffsetRaws.current[index], deadzoneOffsetRaws.current[index][axisIndex]);
+							let tempValue = singularAxis;
+							if (deadzoneOffsetRaws.current[index][axisIndex] > 0) {
+								tempValue -= deadzoneOffsetRaws.current[index][axisIndex];
+							} else if (deadzoneOffsetRaws.current[index][axisIndex] < 0) {
+								tempValue += deadzoneOffsetRaws.current[index][axisIndex];
+							} 
+
+							tempValue = Math.max(-1, Math.min(tempValue, 1));
+							
 							return {
 								raw: singularAxis,
 								deadzoneOffset: deadzoneOffsetRaws.current[index][axisIndex],
-								value: deadzoneOffsetRaws.current[index][axisIndex] > 0 ? singularAxis - deadzoneOffsetRaws.current[index][axisIndex] : deadzoneOffsetRaws.current[index][axisIndex] - singularAxis
+								value: tempValue
 							}
 						});
 

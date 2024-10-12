@@ -64,46 +64,107 @@ This package will not cover the features listed here, as those will instead be c
 Given that this repo is in very early development, don't expect this to be accurate for long... but... here:
 
 ```jsx
+
 import { useEffect } from 'react';
 import './App.css'
 import { useGamepadContext } from '@bigfootds/react-gamepad-utils';
 
 function App() {
-  let {gamepads, setShouldBePolling} = useGamepadContext();
+  let { gamepads, setShouldBePolling, deadzoneOffsetRaws, setAxesDeadzonesForGamepad } = useGamepadContext();
 
   useEffect(() => {
     setShouldBePolling(true)
   }, [setShouldBePolling]);
 
   useEffect(() => {
-    console.log("Gamepad data updated.");
-  }, [gamepads]);
+    // console.log("Gamepad data updated.");
+  }, [gamepads, deadzoneOffsetRaws]);
 
-  if (gamepads.some(entry => entry)){
-    return <>
-     <h1>Found {gamepads.reduce((total, gamepad) => {
-      return gamepad ? total + 1 : total;
-     }, 0)} devices.</h1>
-     {gamepads.map((data, index) => {
-      return <div key={data.id + "-" + index + "-" + data.index}>
-        <h2>{data.id}</h2>
-        {data.buttons.map((button, buttonIndex) => <div key={buttonIndex}>
-        <h3>Button {buttonIndex}: {button.pressed ? "Pressed" : "Not Pressed"}</h3>
-        <h3>Button {buttonIndex}: {button.touched ? "Touched" : "Not Touched"}</h3>
-        <h3>Button {buttonIndex}: {button.value}</h3>
-        </div>)}
-      </div>
-     })}
-    </>
+  if (gamepads.some(entry => entry)) {
+    return <div id='gamepadDemoZone'>
+      <h1>Found {gamepads.reduce((total, gamepad) => {
+        return gamepad ? total + 1 : total;
+      }, 0)} devices.</h1>
+      {gamepads.map((data, index) => {
+        return <div key={data.id + "-" + index + "-" + data.index}>
+          <h2>{data.id}</h2>
+          <h3>Gamepad {index}</h3>
+          <button onClick={() => setAxesDeadzonesForGamepad(index)}>
+            Update Deadzones (Do not touch the joysticks when clicking this button)
+          </button>
+          <div className='inputsDisplayZone'>
+            <ul>
+              {data.buttons.map((button, buttonIndex) =>
+                <div key={"button-" + buttonIndex}>
+                  <li>
+                    Button {buttonIndex}
+                    <ul>
+                      <li>Button {buttonIndex}: {button.pressed ? "Pressed" : "Not Pressed"}</li>
+                      <li>Button {buttonIndex}: {button.touched ? "Touched" : "Not Touched"}</li>
+                      <li>Button {buttonIndex}: {button.value}</li>
+                    </ul>
+                  </li>
+
+                </div>
+              )}
+            </ul>
+            <ul>
+              {data.axes.map((axis, axisIndex) =>
+                <div key={"axis-"+ axisIndex}>
+                  <li>
+                    Axis {axisIndex}
+                    <ul>
+                      <li>Raw: {axis.raw}</li>
+                      <li>Deadzone Offset: {axis.deadzoneOffset}</li>
+                      <li>Value: {axis.value}</li>
+                    </ul>
+                    
+                  </li>
+
+                </div>
+              )}
+            </ul>
+          </div>
+
+        </div>
+      })}
+    </div>
   } else {
     return <>
-    <h1>No devices available.</h1>
+      <h1>No devices available.</h1>
     </>
   }
 }
 
 export default App
 ```
+
+Add this CSS to your default Vite ReactJS app to see a demo like the screenshot below:
+
+```css
+#gamepadDemoZone {
+  text-align: left;
+  
+  .inputsDisplayZone {
+    display: flex;
+  }
+}
+```
+
+Per Chromium restrictions, gamepads do not get detected until after they have been used. You'll wanna prompt your users to "press a button to play" or some similar message.
+
+![From the sample code above, this image appears. No devices are detected until they are used.](./docs/001.png)
+
+Each device can be accessed and its properties can be read.
+
+![A sample of what we can display or detect once a controller has been detected.](./docs/002.png)
+
+To set a gamepad axis' deadzone, just call the `setAxesDeadzonesForGamepad()` function and pass in the gamepad's index. Just keep in mind that deadzones may lead to weird behaviour - and not supporting deadzones will definitely lead to weirder behaviour. You should provide a way for users to wipe any stored deadzone data, a way to add a "minimum required movement" property (which we're thinking of adding, who knows when?) to help offset drifty joysticks, and a way to call that automated `setAxesDeadzonesForGamepad()` function too. Controller input can be a lot of work!
+
+![An example of axis deadzones and their impact on an axis value.](./docs/003.png.png)
+
+
+
 
 ## Device Confirmation List
 
