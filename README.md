@@ -161,7 +161,7 @@ Each device can be accessed and its properties can be read.
 
 To set a gamepad axis' deadzone, just call the `setAxesDeadzonesForGamepad()` function and pass in the gamepad's index. Just keep in mind that deadzones may lead to weird behaviour - and not supporting deadzones will definitely lead to weirder behaviour. You should provide a way for users to wipe any stored deadzone data, a way to add a "minimum required movement" property (which we're thinking of adding, who knows when?) to help offset drifty joysticks, and a way to call that automated `setAxesDeadzonesForGamepad()` function too. Controller input can be a lot of work!
 
-![An example of axis deadzones and their impact on an axis value.](./docs/003.png.png)
+![An example of axis deadzones and their impact on an axis value.](./docs/003.png)
 
 
 
